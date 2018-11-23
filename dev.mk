@@ -16,7 +16,7 @@ endif
 bb_bins=$(prj)/3rdparty/buildroot-bins-$(dev)
 staging=$(bb_bins)/staging
 
-ifeq ($(dev),rpi3_router)
+ifeq ($(dev),rpi3-router)
 cross=$(bb_bins)/host/bin/arm-linux-gnueabihf-
 host=arm-linux
 arch=arm
@@ -24,7 +24,7 @@ kern_ver=4.4.92
 apps="logger logger_test"
 endif
 
-ifeq ($(dev),bpi64_media)
+ifeq ($(dev),bpi64-media)
 cross=$(bb_bins)/host/bin/aarch64-linux-gnu-
 host=arm-linux
 arch=arm
