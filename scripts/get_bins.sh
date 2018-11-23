@@ -18,19 +18,13 @@ get_tarball()
        echo "File $fname not exists on server:$server"
        return 1
    fi
-   md5=$(grep md5 $conf | sed "s/md5=//")
-   tmpmd5=$(md5sum $fname | awk '{print $1}')
-   if [ "$md5" != "$tmpmd5" ]
-   then
-      echo "File ($fname) Download failed! md5 is incorrect! Continue as usual"
-   fi
    tar -zxvf $fname -C $top/3rdparty/$dev
    rm -rf $fname
    return 0
 }
 
 ## Buildroot ########
-if [ ! -d $top/3rdparty/buildroot-bins-$dev ]
+if [ ! -d $top/3rdparty/$dev/buildroot-bins-$dev ]
 then
     echo "Get the buildroot binaries!"
     get_tarball
@@ -42,8 +36,8 @@ then
 fi
 
 # check that hashtag in bin directory is same
-bin_tag=`cat $top/3rdparty/buildroot-bins-$dev/buildroot-hashtag.txt`
-required_tag=$(grep "tag=" $conf | sed 's/tag=//')
+bin_tag=`cat $top/3rdparty/$dev/buildroot-bins-$dev/buildroot-hashtag.txt`
+required_tag=$(grep "tag=" $conf | sed 's/bb_tag=//')
 if [ "$bin_tag" != "$required_tag" ]
 then
    rm -rf $top/3rdparty/buildroot-bins-$dev
