@@ -1,23 +1,22 @@
 #!/bin/bash -x
 
-dev=$2
-top=$(dirname -- "$0")/../
-if [ $# -lt 2 ]
+dev=$1
+top=$(dirname -- "$0")/..
+if [ $# -lt 1 ]
 then
-   echo "Platform and device type should be supplied!!!"
+   echo "Device type should be supplied!!!"
    exit -1
 fi
 
-cd $top/3rdparty/buildroot-src
 outdir=buildroot-bins-$dev
-indir=output-$dev
-conf=$top/3rdparty/configs/$dev-bins.conf
+indir=$top/3rdparty/$dev/buildroot-output
+conf=$top/3rdparty/$dev/configs/$dev-bins.conf
 fname=$outdir-$(date +%F)-$(git rev-parse HEAD | cut -c1-8).tgz
 
 rm -rf $outdir
 mkdir -p $outdir
 
-cp -a ./$indir/images/rootfs.tar.xz $outdir/
+cp -a ./$indir/images/rootfs.tar* $outdir/
 cp -a ./$indir/images/bzImage $outdir/
 cp -a ./$indir/host $outdir/
 cd $outdir

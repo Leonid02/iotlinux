@@ -1,12 +1,12 @@
 #!/bin/sh
-dev=$2
-top=$(dirname -- "$0")/../
-conf=$top/3rdparty/configs/$dev-bins.conf
+dev=$1
+top=$(dirname -- "$0")/..
+conf=$top/3rdparty/$dev/configs/$dev-bins.conf
 server=orion.homelinux.net
 
 get_tarball()
 {
-   fname=$(grep fname $conf | sed "s/fname=//")
+   fname=$(grep fname $conf | sed "s/bb_fname=//")
    if [ "$fname""xx" == "xx" ]
    then
        echo "Can't parse device's config file"
@@ -24,7 +24,7 @@ get_tarball()
    then
       echo "File ($fname) Download failed! md5 is incorrect! Continue as usual"
    fi
-   tar -zxvf $fname -C $top/3rdparty/
+   tar -zxvf $fname -C $top/3rdparty/$dev
    rm -rf $fname
    return 0
 }

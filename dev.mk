@@ -3,9 +3,13 @@ prj=$(PWD)
 endif
 
 is_dev_ok=1
-devs="rpi3_router bpi64_media"
+devs="rpi3-router bpi64-media"
 
-ifneq ($(dev),$(filter $(dev), rpi3_router bpi64_media))
+ifneq ($(dev),$(filter $(dev), rpi3-router bpi64-media))
+	is_dev_ok=0
+endif
+
+ifeq ($(dev),)
 	is_dev_ok=0
 endif
 
@@ -39,16 +43,16 @@ test_env:
 	fi
 
 get_bins:
-	$(prj)/scripts/get_bins.sh $(dev);
+	$(prj)/scripts/get_bins.sh $(dev)
 
-buildroot:
-	make O=output-$(dev) -C $(prj)/3rdparty/buildroot-src defconfig BR2_DEFCONFIG=$(prj)/3rdparty/configs/$(dev)_buildroot_defconfig
+buildroot:	test_env
+	make O=$(prj)/3rdparty/$(dev)/buildroot-output -C $(prj)/3rdparty/buildroot-src defconfig BR2_DEFCONFIG=$(prj)/3rdparty/$(dev)/configs/$(dev)-buildroot-defconfig
 	@if [ $$? -ne 0 ]; \
 		then \
 		echo "Buildroot config failed!"; \
 		exit 1;\
 	fi
-	make O=output-$(dev) LINUX_DIR=$(prj)/3rdparty/kernel/$(dev)/kernel_headers LINUX_VERSION=$(kern_ver) -C $(TOP)/3rdparty/buildroot-src
+	make O=$(prj)/3rdparty/$(dev)/buildroot-output -C $(prj)/3rdparty/buildroot-src
 	@if [ $$? -ne 0 ]; \
 		then \
 		echo "Buildroot build failed!"; \
@@ -60,7 +64,7 @@ buildroot:
 	cd -
 
 clean_buildroot:
-	make O=output-$(dev) -C $(prj)/3rdparty/buildroot-src clean
+	make O=$(prj)/3rdparty/$(dev)/buildroot-output -C $(prj)/3rdparty/buildroot-src clean
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Buildroot clean failed!"; \
@@ -68,7 +72,7 @@ clean_buildroot:
 	fi
 
 distclean_buildroot:
-	make O=output-$(dev) -C $(prj)/3rdparty/buildroot-src distclean
+	make O=$(prj)/3rdparty/$(dev)/buildroot-output -C $(prj)/3rdparty/buildroot-src distclean
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Buildroot disclean failed!"; \
