@@ -1,6 +1,5 @@
 # Makefile
-PRJ=..
-C_FLAGS = -I../infra/include
-DBGLIBS = -linfra_d
-RELLIBS = -linfra
-include ../Rules.mk
+CFLAGS=-I../logger/include
+DBGLIBS=-llogger_d
+RELLIBS=-llogger
+include ../../common.mk

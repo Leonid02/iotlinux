@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 
 
 
-	logStart(5,5);
+	logStart("logger_test", 5, 5);
 	setLogLevel(LOG_DEBUG);
 
 

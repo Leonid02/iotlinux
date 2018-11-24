@@ -3,10 +3,9 @@ include $(prj)/dev.mk
 
 all:	build
 
-build:	test_env
-	$(MAKE) get_bins
+build:	test_env get_bins
 	@for i in $(apps); do \
-		$(MAKE) dev=$(dev) -C $$i; \
+		$(MAKE) dev=$(dev) -C apps/$$i; \
 		if [ $$? -ne 0 ]; \
 		then \
 			echo "Component: $$i build failed. Stop!"; \
@@ -16,17 +15,17 @@ build:	test_env
 
 install: build
 	@for i in $(apps); do \
-		$(MAKE) dev=$(dev) -C $$i install; \
+		$(MAKE) dev=$(dev) -C apps/$$i install; \
 	done;
 
 clean: 
 	@for i in $(apps); do \
-		$(MAKE) dev=$(dev) -C $$i clean; \
+		$(MAKE) dev=$(dev) -C apps/$$i clean; \
 	done
 
 distclean:
 	@for i in $(apps); do \
-		$(MAKE) dev=$(dev) -C $$i distclean; \
+		$(MAKE) dev=$(dev) -C apps/$$i distclean; \
 	done;
 
 image:
