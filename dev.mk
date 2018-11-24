@@ -13,15 +13,15 @@ ifeq ($(dev),)
 	is_dev_ok=0
 endif
 
-bb_bins=$(prj)/3rdparty/buildroot-bins-$(dev)
+bb_bins=$(prj)/3rdparty/$(dev)/buildroot-bins-$(dev)
 staging=$(bb_bins)/staging
 
 ifeq ($(dev),rpi3-router)
-cross=$(bb_bins)/host/bin/arm-linux-gnueabihf-
+cross=$(bb_bins)/host/bin/arm-linux-
 host=arm-linux
 arch=arm
 kern_ver=4.4.92
-apps="logger logger_test"
+apps=logger logger_test
 endif
 
 ifeq ($(dev),bpi64-media)
@@ -117,12 +117,12 @@ kernel:
 		exit 1; \
 	fi; \
 	cp arch/$(arch)/boot/bzImage $(prj)/3rdparty/kernel/$(dev)/images; \
-	tar -czvf $(prj)/3rdparty/kernel/$(dev)/images/modules.tgz -C $(TOP)/kernel/$(dev)/images/lib modules; \
+	tar -czvf $(prj)/3rdparty/kernel/$(dev)/images/modules.tgz -C $(prj)/kernel/$(dev)/images/lib modules; \
 	rm -rf $(prj)/3rdparty/kernel/$(dev)/images/lib; \
 	cd -
 
 prepare_kernel_headers: clean_kernel kernel
-	@patch -f -d $(prj)/3rdparty/kernel/vspu/linux* -p1 < $(TOP)/scripts/modules_headers_install.patch; \
+	@patch -f -d $(prj)/3rdparty/kernel/vspu/linux* -p1 < $(prj)/scripts/modules_headers_install.patch; \
 	cd $(prj)/3rdparty/kernel/$(dev)/linux*; \
 	make ARCH=$(arch) CROSS_COMPILE=$(cross) INSTALL_MODULES_HDR_PATH=$(prj)/3rdparty/kernel/$(dev)/kernel_headers modules_headers_install; \
 	if [ $$? -ne 0 ]; \

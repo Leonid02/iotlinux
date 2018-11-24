@@ -89,37 +89,10 @@ unsigned int getBoxID() {
 	return gBoxID;
 }
 
-void sendToUDPSocket(char* buf, int len)
-{
-
-	int sockfd;
-	struct sockaddr_in	servaddr;
-
-	// Creating socket file descriptor
-	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
-		return;
-	}
-	memset(&servaddr, 0, sizeof(servaddr));
-
-	// Filling server information
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = htons(PORT_SYSLOG);
-	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-	if(sendto(sockfd, buf, len,MSG_CONFIRM, (const struct sockaddr *) &servaddr, sizeof(servaddr)) < 0){
-		printf("could not send to socket!!  %s\n", strerror(errno));
-
-	}
-	close(sockfd);
-}
-
 void buildLogMsg(unsigned int level, int offset, const char* fmt, ...) {
 	va_start(gVAList, fmt);
 	int n=vsnprintf((char*) gMsg+offset,MAX_BUF-MAX_HEADERS, fmt, gVAList);
 	va_end(gVAList);
 	std::string str(gMsg);
-	//printf("buildLogMsg %d msg_actual_size=%lu [%s]\n",n,str.size(),str.c_str());
-	sendToUDPSocket(str.c_str(),str.size());
-	//syslog(level, gMsg);
+	syslog(level, gMsg);
 }
-///

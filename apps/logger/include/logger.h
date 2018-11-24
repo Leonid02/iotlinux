@@ -7,12 +7,6 @@
 #include <stdio.h>
 #include <time.h>       /* time_t, struct tm, time, localtime, asctime */
 
-#define PORT_IPFIX 4739
-#define PORT_SYSLOG 4740
-//#define PORT_ALERTS 4741
-#define PORT_DISCOVERY 4742
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif

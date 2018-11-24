@@ -82,16 +82,14 @@ RELOBJFILES_CPP = $(CPP_SRC:%.cpp=release/$(dev)/%.o)
 RELOBJFILES_C = $(SRC:%.c=release/$(dev)/%.o)
 
 all: 
-	$(MAKE) test_env
-	$(MAKE) dirs
 	$(MAKE) depend
 	$(MAKE) debug
 	$(MAKE) release
 	$(MAKE) install
 
-dirs: 
-	mkdir -p debug/$(dev)
-	mkdir -p release/$(dev)
+dirs: test_env
+	@mkdir -p debug/$(dev); \
+	mkdir -p release/$(dev); \
 	mkdir -p $(INSTALL_DIR)
 
 install: release
@@ -108,11 +106,9 @@ install: release
 		cd -; \
 	fi
 
-release: test_env
-	$(MAKE) $(RELTARGET)
+release: test_env dirs $(RELTARGET)
 
-debug: test_env 
-	$(MAKE) $(DBGTARGET)
+debug: test_env dirs $(DBGTARGET)
 
 
 $(RELTARGET):	$(RELOBJFILES_CPP) $(RELOBJFILES_C)
@@ -141,17 +137,17 @@ clean:
 distclean:
 	@rm -rf $(INSTALL_DIR)/*$(TARGET)*
 
-depend: $(CPP_SRC) $(SRC)
-	$(DEPEND) $(CFLAGS) -MM $^ > .$(plat)_$(dev)_depend_debug
-	$(DEPEND) $(CFLAGS) -MM $^ > .$(plat)_$(dev)_depend_release
+depend:	$(CPP_SRC) $(SRC)
+	$(VERB)$(DEPEND) $(CFLAGS) -MM $^ > .$(dev)_depend_debug
+	$(VERB)$(DEPEND) $(CFLAGS) -MM $^ > .$(dev)_depend_release
 	@#@sed -i -e "s/\([a-z]*\)/debug\/$(plat)\/$(dev)\/\1/" .$(plat)_$(dev)_depend_debug
 	@#@sed -i -e "s/\([a-z]*\)/release\/$(plat)\/$(dev)\/\1/" .$(plat)_$(dev)_depend_release
 	@#@sed -i -e "s/debug\/ / /" .$(plat)_$(dev)_depend_debug
 	@#@sed -i -e "s/release\/ / /" .$(plat)_$(dev)_depend_release
 
-ifeq (.$(plat)_$(dev)_depend_debug,$(wildcard .$(plat)_$(dev)_depend_debug))
- include .$(plat)_$(dev)_depend_debug
+ifeq (.$(plat)_$(dev)_depend_debug,$(wildcard .$(dev)_depend_debug))
+ include .$(dev)_depend_debug
 endif
-ifeq (.$(plat)_$(dev)_depend_release,$(wildcard .$(plat)_$(dev)_depend_release))
- include .$(plat)_$(dev)_depend_release
+ifeq (.$(dev)_depend_release,$(wildcard .$(dev)_depend_release))
+ include .$(dev)_depend_release
 endif
