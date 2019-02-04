@@ -45,16 +45,31 @@ EOF
 
 prepare_bootfs()
 {
-    tar -zxvf $images/boot.tgz -C $rootfs
+    tar -zxvf $images/boot.tgz -C $bootfs
 	cp $images/zImage $bootfs/kernel8.img
-    cp $images/dtbs/*.dtb $bootfs
-    cp $images/dtbs/overlays $bootfs/ -a
+    cp $images/*.dtb $bootfs
+    cp $images/overlays $bootfs/ -a
+}
+
+prepare_rootfs()
+{
+	tar -xvJf $top/3rdparty/$dev/buildroot-bins-$(dev)/rootfs.tar.gz -C $rootfs
+	cp -a $(top)/overlay/fs-$(dev)/* $rootfs
 }
 
 finish_image()
 {
-if [ "$image" != "" ]; then
-  kpartx -d $image
-  echo "created image $image"
-fi
+	umount $bootfs
+	umount $rootfs
+	if [ "$image" != "" ]; then
+	  kpartx -d $image
+	  echo "created image $image"
+	fi
+	mv $image $images/
+	rm -rf $builddir
 }
+
+prepare_image
+prepare_bootfs
+prepare_rootfs
+finish_image
