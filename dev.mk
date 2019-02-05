@@ -20,7 +20,10 @@ ifeq ($(dev),rpi3-router)
 cross=$(bb_bins)/host/bin/arm-linux-
 host=arm-linux
 arch=arm
-kern_ver=4.4.92
+kern_ver=4.14.68
+kern_dir=$(prj)/3rdparty/$(dev)/kernel/linux-4.14.68
+kern_defconfig=bcm2709_defconfig
+dtb=bcm27*.dtb
 apps=logger logger_test
 endif
 
@@ -29,6 +32,7 @@ cross=$(bb_bins)/host/bin/aarch64-linux-gnu-
 host=arm-linux
 arch=arm
 kern_ver=4.2.10
+kern_defconfig=bcm2709_defconfig
 apps="logger logger_test"
 endif
 
@@ -46,7 +50,7 @@ get_bins:
 	$(prj)/scripts/get_bins.sh $(dev)
 
 buildroot:	test_env
-	make O=$(prj)/3rdparty/$(dev)/buildroot-output -C $(prj)/3rdparty/buildroot-src defconfig BR2_DEFCONFIG=$(prj)/3rdparty/$(dev)/configs/$(dev)-buildroot-defconfig
+	make O=$(prj)/3rdparty/$(dev)/buildroot-output LINUX_DIR=$(kern_dir) LINUX_VERSION=$(kern_ver) -C $(prj)/3rdparty/buildroot-src defconfig BR2_DEFCONFIG=$(prj)/3rdparty/$(dev)/configs/$(dev)-buildroot-defconfig
 	@if [ $$? -ne 0 ]; \
 		then \
 		echo "Buildroot config failed!"; \
@@ -79,8 +83,16 @@ distclean_buildroot:
 		exit 1; \
 	fi
 
-clean_kernel:
-	@cd $(prj)/3rdparty/kernel/$(dev)/linux*; \
+prepare_kernel:
+	@if [ ! -d $(kern_dir) ]; \
+	then \
+		cd $(prj)/3rdparty/$(dev)/kernel/; \
+		tar -xvJf linux*; \
+		cd -; \
+	fi
+	
+clean_kernel:	prepare_kernel
+	@cd $(prj)/3rdparty/$(dev)/kernel/linux*; \
 	make ARCH=$(arch) CROSS_COMPILE=$(cross) mrproper; \
 	if [ $$? -ne 0 ]; \
 	then \
@@ -89,10 +101,10 @@ clean_kernel:
 	fi; \
 	cd -
 
-kernel:
-	cd $(prj)/3rdparty/kernel/$(dev)/linux*; \
-	cp $(prj)/3rdparty/configs/$(dev)_kernel_defconfig arch/$(arch)/configs; \
-	make ARCH=$(arch) CROSS_COMPILE=$(cross) $(dev)_kernel_defconfig; \
+kernel:	prepare_kernel
+	cd $(prj)/3rdparty/$(dev)/kernel/linux*; \
+	cp $(prj)/3rdparty/$(dev)/configs/$(kern_defconfig) arch/$(arch)/configs; \
+	make ARCH=$(arch) CROSS_COMPILE=$(cross) $(kern_defconfig); \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel create config failed!"; \
@@ -104,27 +116,38 @@ kernel:
 		echo "Kernel build failed!"; \
 		exit 1; \
 	fi; \
+	make ARCH=$(arch) CROSS_COMPILE=$(cross) dtbs; \
+	if [ $$? -ne 0 ]; \
+	then \
+		echo "Kernel build failed!"; \
+		exit 1; \
+	fi; \
 	make ARCH=$(arch) CROSS_COMPILE=$(cross) modules; \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel build modules failed!"; \
 		exit 1; \
 	fi; \
-	make ARCH=$(arch) CROSS_COMPILE=$(cross) INSTALL_MOD_PATH=$(prj)/3rdparty/kernel/$(dev)/images modules_install; \
+	make ARCH=$(arch) CROSS_COMPILE=$(cross) INSTALL_MOD_PATH=$(prj)/3rdparty/$(dev)/images modules_install; \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel install modules failed!"; \
 		exit 1; \
 	fi; \
-	cp arch/$(arch)/boot/bzImage $(prj)/3rdparty/kernel/$(dev)/images; \
-	tar -czvf $(prj)/3rdparty/kernel/$(dev)/images/modules.tgz -C $(prj)/kernel/$(dev)/images/lib modules; \
-	rm -rf $(prj)/3rdparty/kernel/$(dev)/images/lib; \
+	cp arch/$(arch)/boot/zImage $(prj)/3rdparty/$(dev)/images; \
+	cp arch/$(arch)/boot/dts/$(dtb) $(prj)/3rdparty/$(dev)/images; \
+	if [ -d arch/$(arch)/boot/dts/overlays ]; \
+	then \
+		cd arch/$(arch)/boot/dts/overlays/ && tar -czvf $(prj)/3rdparty/$(dev)/images/overlays.tgz *.dtbo && cd -; \
+	fi; \
+	tar -czvf $(prj)/3rdparty/$(dev)/images/modules.tgz -C $(prj)/3rdparty/$(dev)/images/lib modules; \
+	rm -rf $(prj)/3rdparty/$(dev)/images/lib; \
 	cd -
 
 prepare_kernel_headers: clean_kernel kernel
-	@patch -f -d $(prj)/3rdparty/kernel/vspu/linux* -p1 < $(prj)/scripts/modules_headers_install.patch; \
-	cd $(prj)/3rdparty/kernel/$(dev)/linux*; \
-	make ARCH=$(arch) CROSS_COMPILE=$(cross) INSTALL_MODULES_HDR_PATH=$(prj)/3rdparty/kernel/$(dev)/kernel_headers modules_headers_install; \
+	@patch -f -d $(prj)/3rdparty/$(dev)/kernel/linux* -p1 < $(prj)/scripts/modules_headers_install.patch; \
+	cd $(prj)/3rdparty/$(dev)/kernel/linux*; \
+	make ARCH=$(arch) CROSS_COMPILE=$(cross) INSTALL_MODULES_HDR_PATH=$(prj)/3rdparty/$(dev)/kernel/kernel_headers modules_headers_install; \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel create_headers failed!"; \

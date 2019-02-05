@@ -5,11 +5,12 @@ top=$(dirname -- "$0")/..
 builddir=$top/3rdparty/$dev/buildimg
 images=$top/3rdparty/$dev/images
 image=$builddir/$dev-$(date +%F).img
-bootsize="64M"
+bootsize=64
 rootfs="${builddir}/rootfs"
 bootfs="${rootfs}/boot"
 bootp=
 rootp=
+part_position=8192
 
 prepare_image()
 {
@@ -23,48 +24,50 @@ prepare_image()
 n
 p
 1
-+$bootsize
+$part_position
++${bootsize}M
 t
 c
 n
 p
 2
+$((part_position+bootsize*1024*2))
+
 w
 EOF
-    losetup -d $device
-    device=`kpartx -va $image | sed -E 's/.*(loop[0-9])p.*/\1/g' | head -1`
-    device="/dev/mapper/${device}"
+	echo "device: $device"
+	partprobe -s $device
     bootp=${device}p1
     rootp=${device}p2
     mkfs.vfat $bootp
     mkfs.ext4 $rootp
     mkdir -p $rootfs
     mount $rootp $rootfs
+	mkdir $bootfs
     mount $bootp $bootfs
 }
 
 prepare_bootfs()
 {
-    tar -zxvf $images/boot.tgz -C $bootfs
-	cp $images/zImage $bootfs/kernel8.img
+    tar -zxvf $images/boot.tgz -C $rootfs
+	cp $images/zImage $bootfs/kernel7.img
     cp $images/*.dtb $bootfs
-    cp $images/overlays $bootfs/ -a
+    tar -zxvf $images/overlays.tgz -C $bootfs/overlays
 }
 
 prepare_rootfs()
 {
-	tar -xvJf $top/3rdparty/$dev/buildroot-bins-$(dev)/rootfs.tar.gz -C $rootfs
-	cp -a $(top)/overlay/fs-$(dev)/* $rootfs
+	tar -xvJf $top/3rdparty/$dev/buildroot-bins-$dev/rootfs.tar.xz -C $rootfs
+	tar -zxvf $images/modules.tgz -C $rootfs/lib/
+	tar -zxvf $images/firmware.tgz -C $rootfs/lib/
+	cp -a $top/overlay/fs-$dev/* $rootfs
 }
 
 finish_image()
 {
 	umount $bootfs
 	umount $rootfs
-	if [ "$image" != "" ]; then
-	  kpartx -d $image
-	  echo "created image $image"
-	fi
+	losetup -d $device
 	mv $image $images/
 	rm -rf $builddir
 }

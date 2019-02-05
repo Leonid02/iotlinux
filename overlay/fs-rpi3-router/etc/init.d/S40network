@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Start the network....
+#
+
+# Debian ifupdown needs the /run/network lock directory
+mkdir -p /run/network
+
+case "$1" in
+  start)
+	printf "Loading wifi module: "                    
+	lsmod | grep brcmfmac > /dev/null 2>&1
+	if [ $? -eq 1 ]
+	then
+		modprobe brcmfmac
+	fi
+	sleep 1
+	printf "Starting network: "
+	/sbin/ifup -a
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+	sleep 2
+	/usr/sbin/hostapd /etc/hostapd.conf -B
+	/usr/sbin/iptables-restore < /etc/iptables.ipv4.nat
+	sysctl -w net.ipv4.ip_forward=1
+	;;
+  stop)
+	printf "Stopping network: "
+	killall hostapd
+	/sbin/ifdown -a
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+	;;
+  restart|reload)
+	"$0" stop
+	"$0" start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+

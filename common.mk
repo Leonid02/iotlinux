@@ -11,8 +11,8 @@ ifdef V
  VERB=
 endif
 
-TARGET_DIR = $(prj)/overlay/fs-$(dev)
-INSTALL_DIR = $(TARGET_DIR)/usr/bin
+TARGET_DIR = $(prj)/overlay/fs-$(dev)/opt/$(dev)
+INSTALL_DIR = $(TARGET_DIR)/bin
 ifndef TARGET
 	TARGET=$(notdir $(CURDIR))
 endif
@@ -32,6 +32,7 @@ endif
 STRIP=$(cross)strip
 
 ifeq ($(IS_LIB),y) 
+ INSTALL_DIR = $(TARGET_DIR)/lib
  ifndef MAJOR_VER
   MAJOR_VER=1
  endif
@@ -53,12 +54,11 @@ ifeq ($(IS_LIB),y)
  CFLAGS += -fPIC
  DBGTARGET = debug/$(dev)/lib$(TARGET)_d$(POSTFIX)
  RELTARGET = release/$(dev)/lib$(TARGET)$(POSTFIX)
- INSTALL_DIR = $(TARGET_DIR)/usr/lib
 else
  IS_LIB=
  DBGTARGET = debug/$(dev)/$(TARGET)_d
  RELTARGET = release/$(dev)/$(TARGET)
- LDFLAGS = --sysroot=$(staging) -L$(TARGET_DIR)/usr/lib -L$(staging)/usr/lib
+ LDFLAGS = --sysroot=$(staging) -L$(TARGET_DIR)/lib -L$(staging)/usr/lib
 endif
 
 CFLAGS += -Wall -I./include -I$(staging)/usr/include -fno-strict-aliasing $(CPP_FLAGS) -D$(dev)

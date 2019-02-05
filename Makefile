@@ -29,7 +29,7 @@ distclean:
 	done;
 
 image:
-	$(prj)/scripts/create_img_$(dev).sh $(BUILDROOT_BINS) $(dev);
+	sudo $(prj)/scripts/create_img_$(dev).sh $(dev);
 
 deploy: build 
 	$(MAKE) install
