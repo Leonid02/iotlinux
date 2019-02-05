@@ -87,7 +87,7 @@ prepare_kernel:
 	@if [ ! -d $(kern_dir) ]; \
 	then \
 		cd $(prj)/3rdparty/$(dev)/kernel/; \
-		tar -xvJf linux*; \
+		7z x linux*; \
 		cd -; \
 	fi
 	

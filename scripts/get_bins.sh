@@ -6,21 +6,17 @@ server=orion.homelinux.net
 
 get_tarball()
 {
-   fname=$(grep fname $conf | sed "s/bb_fname=//")
-   if [ "$fname""xx" == "xx" ]
-   then
-       echo "Can't parse device's config file"
-       return 1
-   fi
-   wget http://$server:5252/buildroot-bins/$fname
-   if [ $? -ne 0 ]
-   then
-       echo "File $fname not exists on server:$server"
-       return 1
-   fi
-   tar -zxvf $fname -C $top/3rdparty/$dev
-   rm -rf $fname
-   return 0
+	fname=$1
+	targetdir=$2
+	wget http://$server:5252/buildroot-bins/$1
+	if [ $? -ne 0 ]
+	then
+		echo "File $1 not exists on server:$server"
+		return 1
+	fi
+	tar -zxvf $fname -C $targetdir
+	rm -rf $fname
+	return 0
 }
 
 ## Buildroot ########
@@ -40,13 +36,33 @@ bin_tag=`cat $top/3rdparty/$dev/buildroot-bins-$dev/buildroot-hashtag.txt`
 required_tag=$(grep "tag=" $conf | sed 's/bb_tag=//')
 if [ "$bin_tag" != "$required_tag" ]
 then
-   rm -rf $top/3rdparty/buildroot-bins-$dev
-   get_tarball
-   if [ $? -eq 1 ]
-   then
-       echo "Can't retrieve tarball of buildroot bins"
-       exit 1
-   fi
+	rm -rf $top/3rdparty/buildroot-bins-$dev
+	bbarchive=$(grep fname $conf | sed "s/bb_fname=//")
+	if [ "$bbarchive""xx" == "xx" ]
+	then
+		echo "Can't parse device's config file"
+		exit 1
+	fi
+	get_tarball $bbarchive $top/3rdparty/$dev
+	if [ $? -eq 1 ]
+	then
+		echo "Can't retrieve tarball of buildroot bins"
+		exit 1
+	fi
+fi
+
+# download Linux kernel sources
+kernarchive=$(grep fname $conf | sed "s/bb_fname=//")
+if [ "$kernarchive""xx" == "xx" ]
+then
+	echo "Can't parse device's config file"
+	exit 1
+fi
+get_tarball $kernarchive $top/3rdparty/$dev/kernel
+if [ $? -eq 1 ]
+then
+	echo "Can't retrieve tarball of buildroot bins"
+	exit 1
 fi
 
 exit 0
