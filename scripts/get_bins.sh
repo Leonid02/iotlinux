@@ -8,7 +8,7 @@ get_tarball()
 {
 	fname=$1
 	targetdir=$2
-	wget http://$server:5252/buildroot-bins/$1
+	wget --retry-connrefused --tries=2 --timeout=2 http://$server:5252/buildroot-bins/$1
 	if [ $? -ne 0 ]
 	then
 		echo "File $1 not exists on server:$server"
@@ -36,6 +36,8 @@ bin_tag=`cat $top/3rdparty/$dev/buildroot-bins-$dev/buildroot-hashtag.txt`
 required_tag=$(grep "tag=" $conf | sed 's/bb_tag=//')
 if [ "$bin_tag" != "$required_tag" ]
 then
+	echo "tags incorrect: curr:$bin_tag"
+	echo "            required:$required_tag"
 	rm -rf $top/3rdparty/buildroot-bins-$dev
 	bbarchive=$(grep fname $conf | sed "s/bb_fname=//")
 	if [ "$bbarchive""xx" == "xx" ]
@@ -51,18 +53,24 @@ then
 	fi
 fi
 
-# download Linux kernel sources
-kernarchive=$(grep fname $conf | sed "s/bb_fname=//")
-if [ "$kernarchive""xx" == "xx" ]
+exit 0
+
+kernarchive=$(grep kernel $conf | sed "s/kernel=//")
+
+if [ ! -e $top/3rdparty/$dev/kernel/$kernarchive ]
 then
-	echo "Can't parse device's config file"
-	exit 1
-fi
-get_tarball $kernarchive $top/3rdparty/$dev/kernel
-if [ $? -eq 1 ]
-then
-	echo "Can't retrieve tarball of buildroot bins"
-	exit 1
+	# download Linux kernel sources
+	if [ "$kernarchive""xx" == "xx" ]
+	then
+		echo "Can't parse device's config file"
+		exit 1
+	fi
+	get_tarball $kernarchive $top/3rdparty/$dev/kernel
+	if [ $? -eq 1 ]
+	then
+		echo "Can't retrieve tarball of buildroot bins"
+		exit 1
+	fi
 fi
 
 exit 0

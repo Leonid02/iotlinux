@@ -5,7 +5,7 @@ endif
 is_dev_ok=1
 devs="rpi3-router bpi64-media"
 
-ifneq ($(dev),$(filter $(dev), rpi3-router bpi64-media))
+ifneq ($(dev),$(filter $(dev), rpi3-router bpi64-media flrec))
 	is_dev_ok=0
 endif
 
@@ -34,6 +34,16 @@ arch=arm
 kern_ver=4.2.10
 kern_defconfig=bcm2709_defconfig
 apps="logger logger_test"
+endif
+
+ifeq ($(dev),flrec)
+cross=$(bb_bins)/host/bin/arm-linux-gnueabi-
+host=arm-linux
+arch=arm
+kern_ver=4.19.56
+kern_dir=$(prj)/3rdparty/$(dev)/kernel/linux-at91
+kern_defconfig=sama5d3-kimdu_defconfig
+apps="recording-srv"
 endif
 
 all:
@@ -87,7 +97,7 @@ prepare_kernel:
 	@if [ ! -d $(kern_dir) ]; \
 	then \
 		cd $(prj)/3rdparty/$(dev)/kernel/; \
-		7z x linux*; \
+		tar -xvJf linux*; \
 		cd -; \
 	fi
 	
@@ -101,34 +111,34 @@ clean_kernel:	prepare_kernel
 	fi; \
 	cd -
 
-kernel:	prepare_kernel
-	cd $(prj)/3rdparty/$(dev)/kernel/linux*; \
+kernel:		prepare_kernel
+	@cd $(kern_dir); \
 	cp $(prj)/3rdparty/$(dev)/configs/$(kern_defconfig) arch/$(arch)/configs; \
-	make ARCH=$(arch) CROSS_COMPILE=$(cross) $(kern_defconfig); \
+	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross) $(kern_defconfig); \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel create config failed!"; \
 		exit 1; \
 	fi; \
-	make ARCH=$(arch) CROSS_COMPILE=$(cross); \
+	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross); \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel build failed!"; \
 		exit 1; \
 	fi; \
-	make ARCH=$(arch) CROSS_COMPILE=$(cross) dtbs; \
+	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross) dtbs; \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel build failed!"; \
 		exit 1; \
 	fi; \
-	make ARCH=$(arch) CROSS_COMPILE=$(cross) modules; \
+	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross) modules; \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel build modules failed!"; \
 		exit 1; \
 	fi; \
-	make ARCH=$(arch) CROSS_COMPILE=$(cross) INSTALL_MOD_PATH=$(prj)/3rdparty/$(dev)/images modules_install; \
+	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross) INSTALL_MOD_PATH=$(prj)/3rdparty/$(dev)/images modules_install; \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel install modules failed!"; \

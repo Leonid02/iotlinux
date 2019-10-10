@@ -1,7 +1,7 @@
 #!/bin/sh
 
 dev=$1
-top=$(dirname -- "$0")/..
+top=$(dirname -- "$0")/../..
 builddir=$top/3rdparty/$dev/buildimg
 images=$top/3rdparty/$dev/images
 image=$builddir/$dev-$(date +%F).img
