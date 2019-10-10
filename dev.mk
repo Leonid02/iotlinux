@@ -43,7 +43,7 @@ arch=arm
 kern_ver=4.19.56
 kern_dir=$(prj)/3rdparty/$(dev)/kernel/linux-at91
 kern_defconfig=sama5d3-kimdu_defconfig
-dtb=sama5d36ek.dtb
+dtb=at91-sama5d3_xplained.dtb
 apps="recording-srv"
 endif
 
