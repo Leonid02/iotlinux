@@ -33,7 +33,7 @@ host=arm-linux
 arch=arm
 kern_ver=4.2.10
 kern_defconfig=bcm2709_defconfig
-apps="logger logger_test"
+apps=logger logger_test
 endif
 
 ifeq ($(dev),flrec)
@@ -44,7 +44,7 @@ kern_ver=4.19.56
 kern_dir=$(prj)/3rdparty/$(dev)/kernel/linux-at91
 kern_defconfig=sama5d3-kimdu_defconfig
 dtb=at91-sama5d3_xplained.dtb
-apps="recording-srv"
+apps=pwrlost recording-srv
 endif
 
 all:
