@@ -82,6 +82,7 @@ RELOBJFILES_CPP = $(CPP_SRC:%.cpp=release/$(dev)/%.o)
 RELOBJFILES_C = $(SRC:%.c=release/$(dev)/%.o)
 
 all: 
+	$(MAKE) dirs
 	$(MAKE) depend
 	$(MAKE) debug
 	$(MAKE) release
