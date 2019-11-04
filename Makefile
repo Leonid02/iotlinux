@@ -28,7 +28,7 @@ distclean:
 		$(MAKE) dev=$(dev) -C apps/$$i distclean; \
 	done;
 
-image:
+image: build
 	sudo $(prj)/3rdparty/$(dev)/create_img.sh $(dev);
 
 deploy: build 
