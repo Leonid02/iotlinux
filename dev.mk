@@ -40,7 +40,7 @@ ifeq ($(dev),flrec)
 cross=$(bb_bins)/host/bin/arm-linux-gnueabi-
 host=arm-linux
 arch=arm
-kern_ver=4.19.56
+kern_ver=4.19.56-linux4sam-6.1-svn1
 kern_dir=$(prj)/3rdparty/$(dev)/kernel/linux-at91
 kern_defconfig=sama5d3-kimdu_defconfig
 dtb=at91-sama5d3_xplained.dtb
