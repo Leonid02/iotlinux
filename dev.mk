@@ -40,7 +40,7 @@ ifeq ($(dev),flrec)
 cross=$(bb_bins)/host/bin/arm-linux-gnueabi-
 host=arm-linux
 arch=arm
-kern_ver=4.19.56-linux4sam-6.1-svn1
+kern_ver=4.19.56-linux4sam-6.1
 kern_dir=$(prj)/3rdparty/$(dev)/kernel/linux-at91
 kern_defconfig=sama5d3-kimdu_defconfig
 dtb=at91-sama5d3_xplained.dtb
@@ -115,31 +115,31 @@ clean_kernel:	prepare_kernel
 kernel:		prepare_kernel
 	@cd $(kern_dir); \
 	cp $(prj)/3rdparty/$(dev)/configs/$(kern_defconfig) arch/$(arch)/configs; \
-	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross) $(kern_defconfig); \
+	make -j4 LOCALVERSION= ARCH=$(arch) CROSS_COMPILE=$(cross) $(kern_defconfig); \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel create config failed!"; \
 		exit 1; \
 	fi; \
-	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross); \
+	make -j4 LOCALVERSION= ARCH=$(arch) CROSS_COMPILE=$(cross); \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel build failed!"; \
 		exit 1; \
 	fi; \
-	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross) dtbs; \
+	make -j4 LOCALVERSION= ARCH=$(arch) CROSS_COMPILE=$(cross) dtbs; \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel build failed!"; \
 		exit 1; \
 	fi; \
-	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross) modules; \
+	make -j4 LOCALVERSION= ARCH=$(arch) CROSS_COMPILE=$(cross) modules; \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel build modules failed!"; \
 		exit 1; \
 	fi; \
-	make -j4 ARCH=$(arch) CROSS_COMPILE=$(cross) INSTALL_MOD_PATH=$(prj)/3rdparty/$(dev)/images modules_install; \
+	make -j4 LOCALVERSION= ARCH=$(arch) CROSS_COMPILE=$(cross) INSTALL_MOD_PATH=$(prj)/3rdparty/$(dev)/images modules_install; \
 	if [ $$? -ne 0 ]; \
 	then \
 		echo "Kernel install modules failed!"; \

@@ -8,7 +8,7 @@ get_tarball()
 {
 	fname=$1
 	targetdir=$2
-	wget --retry-connrefused --tries=2 --timeout=2 http://$server:5252/buildroot-bins/$1
+	wget --retry-connrefused --tries=2 --timeout=2 http://$server:10150/buildroot-bins/$1
 	if [ $? -ne 0 ]
 	then
 		echo "File $1 not exists on server:$server"

@@ -27,6 +27,10 @@ create_image()
 	cd -
 	mv $image $images/
 	mv $ubootImage $images/
+	rm -rf $images/flrec.img
+	cd $images
+	ln -s $(basename $ubootImage) flrec.img
+	cd -
 	rm -rf $builddir
 }
 
