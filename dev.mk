@@ -3,9 +3,9 @@ prj=$(PWD)
 endif
 
 is_dev_ok=1
-devs="rpi3-router bpi64-media"
+devs="rpi3-router bpi64-media flrec x86_64 win"
 
-ifneq ($(dev),$(filter $(dev), rpi3-router bpi64-media flrec))
+ifneq ($(dev),$(filter $(dev), rpi3-router bpi64-media flrec x86_64 win))
 	is_dev_ok=0
 endif
 
@@ -47,6 +47,33 @@ dtb=at91-sama5d3_xplained.dtb
 apps=pwrlost recording-srv
 endif
 
+ifeq ($(dev),x86_64)
+cross=
+#$(bb_bins)/host/bin/arm-linux-gnueabi-
+host=x86_64
+arch=x86_64
+kern_ver=4.9.0-3-amd64
+kern_dir=/usr/src/linux
+kern_defconfig=
+apps=analyzer
+endif
+
+ifeq ($(dev), win)
+host=x86_64
+arch=x86_64
+cross=x86_64-w64-mingw32-
+all:
+
+clean_bootloader:
+	echo "Done!"
+bootloader:
+	echo "Done!"
+clean_kernel:
+	echo "Done!"
+kernel:
+	echo "Done!"
+endif
+
 all:
 
 test_env:
@@ -66,7 +93,7 @@ buildroot:	test_env
 		then \
 		echo "Buildroot config failed!"; \
 		exit 1;\
-	fi
+	fi;
 	make O=$(prj)/3rdparty/$(dev)/buildroot-output -C $(prj)/3rdparty/buildroot-src
 	@if [ $$? -ne 0 ]; \
 		then \

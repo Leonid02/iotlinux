@@ -56,8 +56,9 @@ ifeq ($(IS_LIB),y)
  RELTARGET = release/$(dev)/lib$(TARGET)$(POSTFIX)
 else
  IS_LIB=
- DBGTARGET = debug/$(dev)/$(TARGET)_d
- RELTARGET = release/$(dev)/$(TARGET)
+ POSTFIX=
+ DBGTARGET = debug/$(dev)/$(TARGET)_d$(POSTFIX)
+ RELTARGET = release/$(dev)/$(TARGET)$(POSTFIX)
  LDFLAGS = --sysroot=$(staging) -L$(TARGET_DIR)/lib -L$(staging)/usr/lib
 endif
 
