@@ -29,7 +29,7 @@ distclean:
 	done;
 
 image: build
-	$(prj)/3rdparty/$(dev)/create_img.sh $(dev);
+	sudo $(prj)/3rdparty/$(dev)/create_img.sh $(dev);
 
 deploy: build 
 	$(MAKE) install

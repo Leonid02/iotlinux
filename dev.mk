@@ -37,7 +37,7 @@ apps=logger logger_test
 endif
 
 ifeq ($(dev),flrec)
-cross=$(bb_bins)/host/bin/arm-linux-gnueabi-
+cross=$(bb_bins)/host/bin/arm-buildroot-linux-uclibcgnueabi-
 host=arm-linux
 arch=arm
 kern_ver=4.19.56-linux4sam-6.1

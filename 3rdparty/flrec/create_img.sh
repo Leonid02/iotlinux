@@ -15,7 +15,7 @@ prepare_rootfs()
 	mkdir -p $rootfs
 	tar -zxvf $currdir/buildroot-bins-$dev/rootfs.tar.gz -C $rootfs
 	tar -zxvf $images/modules.tgz -C $rootfs/lib/
-	tar -zxvf $images/firmware.tgz -C $rootfs/lib/
+	#tar -zxvf $images/firmware.tgz -C $rootfs/lib/
 	cp -a $top/overlay/fs-$dev/* $rootfs
 }
 

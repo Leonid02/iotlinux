@@ -56,7 +56,6 @@ ifeq ($(IS_LIB),y)
  RELTARGET = release/$(dev)/lib$(TARGET)$(POSTFIX)
 else
  IS_LIB=
- POSTFIX=
  DBGTARGET = debug/$(dev)/$(TARGET)_d$(POSTFIX)
  RELTARGET = release/$(dev)/$(TARGET)$(POSTFIX)
  LDFLAGS = --sysroot=$(staging) -L$(TARGET_DIR)/lib -L$(staging)/usr/lib
@@ -137,7 +136,7 @@ clean:
 	@rm -rf release/$(dev)/* debug/$(dev)/* *~ .*dep*
 
 distclean:
-	@rm -rf $(INSTALL_DIR)/*$(TARGET)*
+	rm -rf $(INSTALL_DIR)/$(TARGET)*
 
 depend:	$(CPP_SRC) $(SRC)
 	$(VERB)$(DEPEND) $(CFLAGS) -MM $^ > .$(dev)_depend_debug
