@@ -45,6 +45,10 @@ kern_dir=$(prj)/3rdparty/$(dev)/kernel/linux-at91
 kern_defconfig=sama5d3-kimdu_defconfig
 dtb=at91-sama5d3_xplained.dtb
 apps=pwrlost recording-srv
+
+#prepare_kernel ::
+#	@echo "Prepare kernel for FLREC"
+
 endif
 
 ifeq ($(dev),x86_64)
@@ -121,7 +125,7 @@ distclean_buildroot:
 		exit 1; \
 	fi
 
-prepare_kernel:
+prepare_kernel ::
 	@if [ ! -d $(kern_dir) ]; \
 	then \
 		cd $(prj)/3rdparty/$(dev)/kernel/; \

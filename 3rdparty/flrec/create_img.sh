@@ -21,18 +21,24 @@ prepare_rootfs()
 
 create_image()
 {
-	cd $rootfs
-	find . -print0 | cpio --null --create --verbose --format=newc | gzip --best > $image
-	$mkimage -A arm -T ramdisk -C none -d $image $ubootImage
-	cd -
-	mv $image $images/
-	mv $ubootImage $images/
-	rm -rf $images/flrec.img
-	cd $images
-	ln -s $(basename $ubootImage) flrec.img
-	cd -
+	make dev=flrec -f $currdir/../../dev.mk kernel
 	rm -rf $builddir
 }
+
+#create_image()
+#{
+#	cd $rootfs
+#	find . -print0 | cpio --null --create --verbose --format=newc | gzip --best > $image
+#	$mkimage -A arm -T ramdisk -C none -d $image $ubootImage
+#	cd -
+#	mv $image $images/
+#	mv $ubootImage $images/
+#	rm -rf $images/flrec.img
+#	cd $images
+#	ln -s $(basename $ubootImage) flrec.img
+#	cd -
+#	rm -rf $builddir
+#}
 
 prepare_rootfs
 create_image

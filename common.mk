@@ -11,7 +11,10 @@ ifdef V
  VERB=
 endif
 
+ifndef TARGET_DIR
 TARGET_DIR = $(prj)/overlay/fs-$(dev)/opt/$(dev)
+endif
+
 INSTALL_DIR = $(TARGET_DIR)/bin
 ifndef TARGET
 	TARGET=$(notdir $(CURDIR))
