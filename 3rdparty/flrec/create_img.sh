@@ -4,10 +4,7 @@ dev=$1
 top=$(dirname -- "$0")/../../
 currdir=$(dirname -- "$0")
 builddir=$currdir/buildimg
-mkimage=$currdir/buildroot-bins-$dev/host/bin/mkimage
 images=$currdir/images
-image=$builddir/$dev-$(date +%F)-initramfs.cpio.gz
-ubootImage=$builddir/$dev-$(date +%F)-initramfs-uboot.img
 rootfs="${builddir}/rootfs"
 
 prepare_rootfs()
@@ -22,23 +19,14 @@ prepare_rootfs()
 create_image()
 {
 	make dev=flrec -f $currdir/../../dev.mk kernel
+	if [ $? -eq 0 ]
+	then
+		mv $images/zImage $images/zImage-$dev-$(date +%F)
+	else
+		echo "Image build failed!"
+	fi
 	rm -rf $builddir
 }
-
-#create_image()
-#{
-#	cd $rootfs
-#	find . -print0 | cpio --null --create --verbose --format=newc | gzip --best > $image
-#	$mkimage -A arm -T ramdisk -C none -d $image $ubootImage
-#	cd -
-#	mv $image $images/
-#	mv $ubootImage $images/
-#	rm -rf $images/flrec.img
-#	cd $images
-#	ln -s $(basename $ubootImage) flrec.img
-#	cd -
-#	rm -rf $builddir
-#}
 
 prepare_rootfs
 create_image
